@@ -15,7 +15,7 @@ class MainViewModel : ViewModel() {
 	var taskList = getTaskListUseCase.getTaskList()
 
 	fun changeCompletedState(taskElement: TaskElement) {
-		val newElement = taskElement.copy(isCompleted = !taskElement.isCompleted)
+		val newElement = taskElement.copy(completed = !taskElement.completed)
 		editTaskElementUseCase.editTaskElement(newElement)
 	}
 
