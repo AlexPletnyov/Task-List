@@ -4,7 +4,7 @@ data class TaskElement(
 
 	val name: String,
 	val description: String,
-	val isCompleted: Boolean,
+	val completed: Boolean,
 	var id: Int = UNDEFINED_ID
 ) {
 	companion object {
