@@ -7,6 +7,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.alexpletnyov.task_list.R
 
 class TaskElementViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
-	val cbName = view.findViewById<CheckBox>(R.id.cb_name)
-	val tvDescription = view.findViewById<TextView>(R.id.tv_description)
+	val cbName: CheckBox = view.findViewById(R.id.cb_name)
+	val tvDescription: TextView = view.findViewById(R.id.tv_description)
 }

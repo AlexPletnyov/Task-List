@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Task-List</string>
     <string name="add_new_task">Add new task</string>
+    <string name="error_input_name">Invalid name</string>
+    <string name="save">Save</string>
+    <string name="description">Description:</string>
+    <string name="name">Name:</string>
 </resources>
