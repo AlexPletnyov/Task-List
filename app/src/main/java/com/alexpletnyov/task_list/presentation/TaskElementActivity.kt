@@ -4,11 +4,12 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import com.alexpletnyov.task_list.R
 import com.alexpletnyov.task_list.domain.TaskElement
 import java.lang.RuntimeException
 
-class TaskElementActivity : AppCompatActivity() {
+class TaskElementActivity : AppCompatActivity(), TaskElementFragment.OnEditingFinishedListener {
 
 	private var screenMode = MODE_UNKNOWN
 	private var taskElementId = TaskElement.UNDEFINED_ID
@@ -20,6 +21,11 @@ class TaskElementActivity : AppCompatActivity() {
 		if (savedInstanceState == null) {
 			launchRightMode()
 		}
+	}
+
+	override fun onEditingFinished() {
+		Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show()
+		finish()
 	}
 
 	private fun launchRightMode() {

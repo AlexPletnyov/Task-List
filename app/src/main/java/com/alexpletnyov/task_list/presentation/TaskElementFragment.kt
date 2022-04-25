@@ -1,11 +1,9 @@
 package com.alexpletnyov.task_list.presentation
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,6 +19,7 @@ import java.lang.RuntimeException
 class TaskElementFragment() : Fragment() {
 
 	private lateinit var viewModel: TaskElementViewModel
+	private lateinit var onEditingFinishedListener: OnEditingFinishedListener
 
 	private lateinit var tilName: TextInputLayout
 	private lateinit var tilDescription: TextInputLayout
@@ -30,6 +29,15 @@ class TaskElementFragment() : Fragment() {
 
 	private var screenMode: String = MODE_UNKNOWN
 	private var taskElementId: Int = TaskElement.UNDEFINED_ID
+
+	override fun onAttach(context: Context) {
+		super.onAttach(context)
+		if (context is OnEditingFinishedListener) {
+			onEditingFinishedListener = context
+		} else {
+			throw RuntimeException("Activity must implement OnEditingFinishedListener")
+		}
+	}
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -63,7 +71,7 @@ class TaskElementFragment() : Fragment() {
 			tilName.error = message
 		}
 		viewModel.shouldCloseScreen.observe(viewLifecycleOwner) {
-			activity?.onBackPressed()
+			onEditingFinishedListener.onEditingFinished()
 		}
 	}
 
@@ -131,7 +139,13 @@ class TaskElementFragment() : Fragment() {
 		buttonSave = view.findViewById(R.id.save_button)
 	}
 
+	interface OnEditingFinishedListener {
+
+		fun onEditingFinished()
+	}
+
 	companion object {
+
 		private const val SCREEN_MODE = "extra_mode"
 		private const val TASK_ELEMENT_ID = "extra_task_element_id"
 		private const val MODE_EDIT = "mode_edit"
