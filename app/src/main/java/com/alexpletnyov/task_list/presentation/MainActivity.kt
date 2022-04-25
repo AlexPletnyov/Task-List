@@ -1,8 +1,9 @@
 package com.alexpletnyov.task_list.presentation
 
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentContainerView
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -13,10 +14,12 @@ class MainActivity : AppCompatActivity() {
 
 	private lateinit var viewModel: MainViewModel
 	private lateinit var taskListAdapter: TaskListAdapter
+	private var taskElementContainer: FragmentContainerView? = null
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.activity_main)
+		taskElementContainer = findViewById(R.id.task_element_container)
 		setupRecyclerView()
 		viewModel = ViewModelProvider(this)[MainViewModel::class.java]
 		viewModel.taskList.observe(this) {
@@ -24,9 +27,25 @@ class MainActivity : AppCompatActivity() {
 		}
 		val buttonAddTask = findViewById<FloatingActionButton>(R.id.button_add_task)
 		buttonAddTask.setOnClickListener {
-			val intent = TaskElementActivity.newIntentAddElement(this)
-			startActivity(intent)
+			if (isOnePaneMode()) {
+				val intent = TaskElementActivity.newIntentAddElement(this)
+				startActivity(intent)
+			} else {
+				launchFragment(TaskElementFragment.newInstanceAddElement())
+			}
 		}
+	}
+
+	private fun isOnePaneMode(): Boolean {
+		return taskElementContainer == null
+	}
+
+	private fun launchFragment(fragment: Fragment) {
+		supportFragmentManager.popBackStack()
+		supportFragmentManager.beginTransaction()
+			.replace(R.id.task_element_container, fragment)
+			.addToBackStack(null)
+			.commit()
 	}
 
 	private fun setupRecyclerView() {
@@ -72,9 +91,12 @@ class MainActivity : AppCompatActivity() {
 
 	private fun setupClickListener() {
 		taskListAdapter.onTaskElementClickListener = {
-			Log.d("MainActivity", it.toString())
-			val intent = TaskElementActivity.newIntentEditElement(this, it.id)
-			startActivity(intent)
+			if (isOnePaneMode()) {
+				val intent = TaskElementActivity.newIntentEditElement(this, it.id)
+				startActivity(intent)
+			} else {
+				launchFragment(TaskElementFragment.newInstanceEditElement(it.id))
+			}
 		}
 	}
 
