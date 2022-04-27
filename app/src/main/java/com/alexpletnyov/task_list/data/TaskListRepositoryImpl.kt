@@ -1,61 +1,35 @@
 package com.alexpletnyov.task_list.data
 
+import android.app.Application
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import com.alexpletnyov.task_list.domain.TaskElement
 import com.alexpletnyov.task_list.domain.TaskListRepository
-import java.lang.RuntimeException
-import kotlin.random.Random
 
-object TaskListRepositoryImpl: TaskListRepository {
+class TaskListRepositoryImpl(application: Application) : TaskListRepository {
 
-//	private val taskList = mutableListOf<TaskElement>()
-	private val taskList = sortedSetOf<TaskElement>({ p0, p1 -> p0.id.compareTo(p1.id) })
-	private val taskListLD = MutableLiveData<List<TaskElement>>()
+	private val taskListDao = AppDataBase.getInstance(application).taskListDao()
+	private val mapper = TaskListMapper()
 
-	private var autoIncrementId = 0
+	override suspend fun addTaskElement(taskElement: TaskElement) {
+		taskListDao.addTaskList(mapper.mapEntityToDbModel(taskElement))
+	}
 
-	init {
-		for (i in 0..10) {
-			val element = TaskElement(
-				"Task name $i",
-				"Some description...",
-				Random.nextBoolean()
-			)
-			addTaskElement(element)
+	override suspend fun deleteTaskElement(taskElement: TaskElement) {
+		taskListDao.deleteTaskList(taskElement.id)
+	}
+
+	override suspend fun editTaskElement(taskElement: TaskElement) {
+		taskListDao.addTaskList(mapper.mapEntityToDbModel(taskElement))
+	}
+
+	override suspend fun getTaskElement(taskElementId: Int): TaskElement {
+		val dbModel = taskListDao.getTaskElement(taskElementId)
+		return mapper.mapDbModelToEntity(dbModel)
+	}
+
+	override fun getTaskList(): LiveData<List<TaskElement>> =
+		Transformations.map(taskListDao.getTaskList()) {
+			mapper.mapListDbModelToListEntity(it)
 		}
-	}
-
-	override fun addTaskElement(taskElement: TaskElement) {
-		if (taskElement.id == TaskElement.UNDEFINED_ID) {
-			taskElement.id = autoIncrementId++
-		}
-		taskList.add(taskElement)
-		updateTaskList()
-	}
-
-	override fun deleteTaskElement(taskElement: TaskElement) {
-		taskList.remove(taskElement)
-		updateTaskList()
-	}
-
-	override fun editTaskElement(taskElement: TaskElement) {
-		val oldElement = getTaskElement(taskElement.id)
-		taskList.remove(oldElement)
-		addTaskElement(taskElement)
-	}
-
-	override fun getTaskElement(taskElementId: Int): TaskElement {
-		return taskList.find {
-			it.id == taskElementId
-		} ?: throw RuntimeException("Element with id $taskElementId not found")
-	}
-
-	override fun getTaskList(): LiveData<List<TaskElement>> {
-		return taskListLD
-	}
-	
-	private fun updateTaskList() {
-		taskListLD.value = taskList.toList()
-	}
 }

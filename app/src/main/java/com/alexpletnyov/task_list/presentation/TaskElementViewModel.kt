@@ -1,18 +1,20 @@
 package com.alexpletnyov.task_list.presentation
 
-import android.text.BoringLayout
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.alexpletnyov.task_list.data.TaskListRepositoryImpl
 import com.alexpletnyov.task_list.domain.AddTaskElementUseCase
 import com.alexpletnyov.task_list.domain.EditTaskElementUseCase
 import com.alexpletnyov.task_list.domain.GetTaskElementUseCase
 import com.alexpletnyov.task_list.domain.TaskElement
+import kotlinx.coroutines.launch
 
-class TaskElementViewModel : ViewModel() {
+class TaskElementViewModel(application: Application) : AndroidViewModel(application) {
 
-	private val repository = TaskListRepositoryImpl
+	private val repository = TaskListRepositoryImpl(application)
 
 	private val getTaskElementUseCase = GetTaskElementUseCase(repository)
 	private val addTaskElementUseCase = AddTaskElementUseCase(repository)
@@ -31,8 +33,10 @@ class TaskElementViewModel : ViewModel() {
 		get() = _shouldCloseScreen
 
 	fun getTaskElement(taskElementId: Int) {
-		val element = getTaskElementUseCase.getTaskElement(taskElementId)
-		_taskElement.value = element
+		viewModelScope.launch {
+			val element = getTaskElementUseCase.getTaskElement(taskElementId)
+			_taskElement.value = element
+		}
 	}
 
 	fun addTaskElement(inputName: String?, inputDescription: String?) {
@@ -40,9 +44,11 @@ class TaskElementViewModel : ViewModel() {
 		val description = parseInput(inputDescription)
 		val fieldValid = validateInput(name)
 		if (fieldValid) {
-			val taskElement = TaskElement(name, description, false)
-			addTaskElementUseCase.addTaskElement(taskElement)
-			finishWork()
+			viewModelScope.launch {
+				val taskElement = TaskElement(name, description, false)
+				addTaskElementUseCase.addTaskElement(taskElement)
+				finishWork()
+			}
 		}
 	}
 
@@ -52,9 +58,11 @@ class TaskElementViewModel : ViewModel() {
 		val fieldValid = validateInput(name)
 		if (fieldValid) {
 			_taskElement.value?.let {
-				val element = it.copy(name = name, description = description)
-				editTaskElementUseCase.editTaskElement(element)
-				finishWork()
+				viewModelScope.launch {
+					val element = it.copy(name = name, description = description)
+					editTaskElementUseCase.editTaskElement(element)
+					finishWork()
+				}
 			}
 		}
 	}
