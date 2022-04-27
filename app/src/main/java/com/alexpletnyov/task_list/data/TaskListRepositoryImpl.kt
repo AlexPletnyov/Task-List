@@ -11,19 +11,19 @@ class TaskListRepositoryImpl(application: Application) : TaskListRepository {
 	private val taskListDao = AppDataBase.getInstance(application).taskListDao()
 	private val mapper = TaskListMapper()
 
-	override fun addTaskElement(taskElement: TaskElement) {
+	override suspend fun addTaskElement(taskElement: TaskElement) {
 		taskListDao.addTaskList(mapper.mapEntityToDbModel(taskElement))
 	}
 
-	override fun deleteTaskElement(taskElement: TaskElement) {
+	override suspend fun deleteTaskElement(taskElement: TaskElement) {
 		taskListDao.deleteTaskList(taskElement.id)
 	}
 
-	override fun editTaskElement(taskElement: TaskElement) {
+	override suspend fun editTaskElement(taskElement: TaskElement) {
 		taskListDao.addTaskList(mapper.mapEntityToDbModel(taskElement))
 	}
 
-	override fun getTaskElement(taskElementId: Int): TaskElement {
+	override suspend fun getTaskElement(taskElementId: Int): TaskElement {
 		val dbModel = taskListDao.getTaskElement(taskElementId)
 		return mapper.mapDbModelToEntity(dbModel)
 	}
