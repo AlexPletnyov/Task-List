@@ -2,20 +2,20 @@ package com.alexpletnyov.task_list.presentation
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alexpletnyov.task_list.data.TaskListRepositoryImpl
 import com.alexpletnyov.task_list.domain.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MainViewModel(application: Application) : AndroidViewModel(application) {
-
-	private val repository = TaskListRepositoryImpl(application)
-
-	private val getTaskListUseCase = GetTaskListUseCase(repository)
-	private val editTaskElementUseCase = EditTaskElementUseCase(repository)
-	private val deleteTaskElementUseCase = DeleteTaskElementUseCase(repository)
+class MainViewModel @Inject constructor(
+	private val getTaskListUseCase: GetTaskListUseCase,
+	private val editTaskElementUseCase: EditTaskElementUseCase,
+	private val deleteTaskElementUseCase: DeleteTaskElementUseCase
+) : ViewModel() {
 
 	var taskList = getTaskListUseCase.getTaskList()
 

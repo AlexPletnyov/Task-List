@@ -9,7 +9,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.alexpletnyov.task_list.R
+import com.alexpletnyov.task_list.di.ApplicationComponent
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity(), TaskElementFragment.OnEditingFinishedListener {
 
@@ -17,12 +19,21 @@ class MainActivity : AppCompatActivity(), TaskElementFragment.OnEditingFinishedL
 	private lateinit var taskListAdapter: TaskListAdapter
 	private var taskElementContainer: FragmentContainerView? = null
 
+	@Inject
+	lateinit var viewModelFactory: ViewModelFactory
+
+	private val component by lazy {
+		(application as TaskListApplication).component
+	}
+
 	override fun onCreate(savedInstanceState: Bundle?) {
+		component.inject(this)
+
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.activity_main)
 		taskElementContainer = findViewById(R.id.task_element_container)
 		setupRecyclerView()
-		viewModel = ViewModelProvider(this)[MainViewModel::class.java]
+		viewModel = ViewModelProvider(this, viewModelFactory)[MainViewModel::class.java]
 		viewModel.taskList.observe(this) {
 			taskListAdapter.submitList(it)
 		}

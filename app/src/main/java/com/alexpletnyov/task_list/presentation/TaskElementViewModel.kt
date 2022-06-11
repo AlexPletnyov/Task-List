@@ -1,24 +1,20 @@
 package com.alexpletnyov.task_list.presentation
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.alexpletnyov.task_list.data.TaskListRepositoryImpl
 import com.alexpletnyov.task_list.domain.AddTaskElementUseCase
 import com.alexpletnyov.task_list.domain.EditTaskElementUseCase
 import com.alexpletnyov.task_list.domain.GetTaskElementUseCase
 import com.alexpletnyov.task_list.domain.TaskElement
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class TaskElementViewModel(application: Application) : AndroidViewModel(application) {
-
-	private val repository = TaskListRepositoryImpl(application)
-
-	private val getTaskElementUseCase = GetTaskElementUseCase(repository)
-	private val addTaskElementUseCase = AddTaskElementUseCase(repository)
-	private val editTaskElementUseCase = EditTaskElementUseCase(repository)
+class TaskElementViewModel @Inject constructor(
+	private val getTaskElementUseCase: GetTaskElementUseCase,
+	private val addTaskElementUseCase: AddTaskElementUseCase,
+	private val editTaskElementUseCase: EditTaskElementUseCase
+) : ViewModel() {
 
 	private val _errorInputName = MutableLiveData<Boolean>()
 	val errorInputName: LiveData<Boolean>
