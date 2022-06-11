@@ -1,8 +1,9 @@
 package com.alexpletnyov.task_list.data
 
 import com.alexpletnyov.task_list.domain.TaskElement
+import javax.inject.Inject
 
-class TaskListMapper {
+class TaskListMapper @Inject constructor() {
 
 	fun mapEntityToDbModel(taskElement: TaskElement) = TaskElementDbModel(
 		id = taskElement.id,

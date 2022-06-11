@@ -15,6 +15,7 @@ import com.alexpletnyov.task_list.R
 import com.alexpletnyov.task_list.domain.TaskElement
 import com.google.android.material.textfield.TextInputLayout
 import java.lang.RuntimeException
+import javax.inject.Inject
 
 class TaskElementFragment() : Fragment() {
 
@@ -30,7 +31,16 @@ class TaskElementFragment() : Fragment() {
 	private var screenMode: String = MODE_UNKNOWN
 	private var taskElementId: Int = TaskElement.UNDEFINED_ID
 
+	@Inject
+	lateinit var viewModelFactory: ViewModelFactory
+
+	private val component by lazy {
+		(requireActivity().application as TaskListApplication).component
+	}
+
 	override fun onAttach(context: Context) {
+		component.inject(this)
+
 		super.onAttach(context)
 		if (context is OnEditingFinishedListener) {
 			onEditingFinishedListener = context
@@ -54,7 +64,7 @@ class TaskElementFragment() : Fragment() {
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
-		viewModel = ViewModelProvider(this)[TaskElementViewModel::class.java]
+		viewModel = ViewModelProvider(this, viewModelFactory)[TaskElementViewModel::class.java]
 		initViews(view)
 		addTextChangeListener()
 		launchRightMode()

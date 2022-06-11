@@ -1,15 +1,15 @@
 package com.alexpletnyov.task_list.data
 
-import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import com.alexpletnyov.task_list.domain.TaskElement
 import com.alexpletnyov.task_list.domain.TaskListRepository
+import javax.inject.Inject
 
-class TaskListRepositoryImpl(application: Application) : TaskListRepository {
-
-	private val taskListDao = AppDataBase.getInstance(application).taskListDao()
-	private val mapper = TaskListMapper()
+class TaskListRepositoryImpl @Inject constructor(
+	private val taskListDao: TaskListDao,
+	private val mapper: TaskListMapper
+) : TaskListRepository {
 
 	override suspend fun addTaskElement(taskElement: TaskElement) {
 		taskListDao.addTaskList(mapper.mapEntityToDbModel(taskElement))
